@@ -1,0 +1,88 @@
+{
+  "name": "file-transfer-to-ai-chat",
+  "displayName": "File transfer to AI chat",
+  "description": "Select and export project files for AI chat context",
+  "version": "1.3.0",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onView:aiFileTree"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "file-transfer-sidebar",
+          "title": "File transfer to AI chat",
+          "icon": "$(robot)"
+        }
+      ]
+    },
+    "views": {
+      "file-transfer-sidebar": [
+        {
+          "id": "aiFileTree",
+          "name": "File transfer to AI chat"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "aiFileTree.copyPrompt",
+        "title": "📋 Copy as AI Text Prompt",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "aiFileTree.copyFiles",
+        "title": "📁 Copy File Objects",
+        "icon": "$(files)"
+      },
+      {
+        "command": "aiFileTree.copyTree",
+        "title": "🌳 Copy ASCII Directory Tree",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "aiFileTree.clear",
+        "title": "🧹 Clear Selection",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "aiFileTree.refresh",
+        "title": "🔄 Refresh Tree",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "aiFileTree.copyPrompt",
+          "when": "view == aiFileTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "aiFileTree.copyFiles",
+          "when": "view == aiFileTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "aiFileTree.copyTree",
+          "when": "view == aiFileTree",
+          "group": "navigation@3"
+        },
+        {
+          "command": "aiFileTree.refresh",
+          "when": "view == aiFileTree",
+          "group": "navigation@4"
+        },
+        {
+          "command": "aiFileTree.clear",
+          "when": "view == aiFileTree",
+          "group": "navigation@5"
+        }
+      ]
+    }
+  }
+}
