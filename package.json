@@ -2,14 +2,14 @@
   "name": "file-transfer-to-ai-chat",
   "displayName": "File transfer to AI chat",
   "description": "Effortlessly select, package, and transfer codebase files directly to AI assistants (ChatGPT, Claude, LM Studio)",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "publisher": "Dor69",
   "engines": {
     "vscode": "^1.80.0"
   },
   "categories": [
     "Other",
-    "Programming Languages"
+    "Machine Learning"
   ],
   "keywords": [
     "ai",
@@ -33,8 +33,14 @@
   },
   "main": "./extension.js",
   "activationEvents": [
-    "onView:aiFileTree"
+    "onStartupFinished"
   ],
+  "capabilities": {
+    "virtualWorkspaces": false,
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
   "contributes": {
     "viewsContainers": {
       "activitybar": [
@@ -53,31 +59,96 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "aiFileTree",
+        "contents": "Open a folder to start selecting files for your AI chat.\n[Open Folder](command:vscode.openFolder)",
+        "when": "workbenchState == empty"
+      }
+    ],
     "commands": [
       {
         "command": "aiFileTree.copyPrompt",
-        "title": "📋 Copy as AI Text Prompt",
+        "title": "Copy as AI Text Prompt",
+        "category": "AI File Transfer",
         "icon": "$(copy)"
       },
       {
+        "command": "aiFileTree.openPrompt",
+        "title": "Open Prompt in Editor",
+        "category": "AI File Transfer",
+        "icon": "$(go-to-file)"
+      },
+      {
         "command": "aiFileTree.copyFiles",
-        "title": "📁 Copy File Objects",
+        "title": "Copy File Objects",
+        "category": "AI File Transfer",
         "icon": "$(files)"
       },
       {
         "command": "aiFileTree.copyTree",
-        "title": "🌳 Copy ASCII Directory Tree",
+        "title": "Copy ASCII Directory Tree",
+        "category": "AI File Transfer",
         "icon": "$(list-tree)"
       },
       {
+        "command": "aiFileTree.selectAll",
+        "title": "Select All Files",
+        "category": "AI File Transfer",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "aiFileTree.selectOpenEditors",
+        "title": "Select Open Editors",
+        "category": "AI File Transfer",
+        "icon": "$(multiple-windows)"
+      },
+      {
+        "command": "aiFileTree.selectGitChanges",
+        "title": "Select Git Changed Files",
+        "category": "AI File Transfer",
+        "icon": "$(git-commit)"
+      },
+      {
         "command": "aiFileTree.clear",
-        "title": "🧹 Clear Selection",
+        "title": "Clear Selection",
+        "category": "AI File Transfer",
         "icon": "$(clear-all)"
       },
       {
+        "command": "aiFileTree.expandAll",
+        "title": "Expand All",
+        "category": "AI File Transfer",
+        "icon": "$(expand-all)"
+      },
+      {
+        "command": "aiFileTree.collapseAll",
+        "title": "Collapse All",
+        "category": "AI File Transfer",
+        "icon": "$(collapse-all)"
+      },
+      {
         "command": "aiFileTree.refresh",
-        "title": "🔄 Refresh Tree",
+        "title": "Refresh Tree",
+        "category": "AI File Transfer",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "aiFileTree.addToContext",
+        "title": "Add to AI Context",
+        "category": "AI File Transfer",
+        "icon": "$(add)"
+      },
+      {
+        "command": "aiFileTree.removeFromContext",
+        "title": "Remove from AI Context",
+        "category": "AI File Transfer",
+        "icon": "$(remove)"
+      },
+      {
+        "command": "aiFileTree.revealInExplorer",
+        "title": "Reveal in Explorer",
+        "category": "AI File Transfer"
       }
     ],
     "menus": {
@@ -93,21 +164,153 @@
           "group": "navigation@2"
         },
         {
-          "command": "aiFileTree.copyTree",
+          "command": "aiFileTree.selectAll",
           "when": "view == aiFileTree",
           "group": "navigation@3"
         },
         {
-          "command": "aiFileTree.refresh",
+          "command": "aiFileTree.clear",
           "when": "view == aiFileTree",
           "group": "navigation@4"
         },
         {
-          "command": "aiFileTree.clear",
-          "when": "view == aiFileTree",
+          "command": "aiFileTree.expandAll",
+          "when": "view == aiFileTree && !aiFileTree.expanded",
           "group": "navigation@5"
+        },
+        {
+          "command": "aiFileTree.collapseAll",
+          "when": "view == aiFileTree && aiFileTree.expanded",
+          "group": "navigation@5"
+        },
+        {
+          "command": "aiFileTree.refresh",
+          "when": "view == aiFileTree",
+          "group": "navigation@6"
+        },
+        {
+          "command": "aiFileTree.copyTree",
+          "when": "view == aiFileTree",
+          "group": "1_copy@1"
+        },
+        {
+          "command": "aiFileTree.openPrompt",
+          "when": "view == aiFileTree",
+          "group": "1_copy@2"
+        },
+        {
+          "command": "aiFileTree.selectOpenEditors",
+          "when": "view == aiFileTree",
+          "group": "2_select@1"
+        },
+        {
+          "command": "aiFileTree.selectGitChanges",
+          "when": "view == aiFileTree",
+          "group": "2_select@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "aiFileTree.revealInExplorer",
+          "when": "view == aiFileTree",
+          "group": "navigation@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "aiFileTree.addToContext",
+          "group": "7_aiFileTree@1"
+        },
+        {
+          "command": "aiFileTree.removeFromContext",
+          "group": "7_aiFileTree@2"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "aiFileTree.addToContext",
+          "when": "resourceScheme == file",
+          "group": "7_aiFileTree@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "aiFileTree.revealInExplorer",
+          "when": "false"
         }
       ]
+    },
+    "configuration": {
+      "title": "File transfer to AI chat",
+      "properties": {
+        "fileTransferToAI.ignoreNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".git",
+            ".svn",
+            ".hg",
+            "node_modules",
+            "__pycache__",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".venv",
+            "venv",
+            ".env",
+            ".env.*",
+            "dist",
+            "build",
+            "out",
+            "target",
+            "coverage",
+            ".next",
+            ".nuxt",
+            ".gradle",
+            ".vscode",
+            ".idea",
+            ".DS_Store",
+            "Thumbs.db",
+            "package-lock.json",
+            "yarn.lock",
+            "pnpm-lock.yaml"
+          ],
+          "description": "File and folder names to hide (exact names, supports * and ? wildcards)."
+        },
+        "fileTransferToAI.ignoreExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".ico", ".icns",
+            ".pdf", ".zip", ".7z", ".rar", ".tar", ".gz",
+            ".exe", ".dll", ".so", ".dylib", ".bin", ".o", ".a", ".class", ".jar", ".pyc",
+            ".mp3", ".wav", ".mp4", ".mov", ".avi",
+            ".woff", ".woff2", ".ttf", ".otf", ".eot",
+            ".safetensors", ".gguf", ".onnx", ".pt", ".pth", ".ckpt",
+            ".db", ".sqlite", ".docx", ".xlsx", ".pptx"
+          ],
+          "description": "File extensions to hide from the tree."
+        },
+        "fileTransferToAI.maxFileSizeKB": {
+          "type": "number",
+          "default": 1024,
+          "minimum": 0,
+          "description": "Files larger than this are skipped when building a text prompt (0 = no limit)."
+        },
+        "fileTransferToAI.includeTreeInPrompt": {
+          "type": "boolean",
+          "default": true,
+          "description": "Prepend an ASCII directory tree of the selected files to the text prompt."
+        },
+        "fileTransferToAI.openFileOnClick": {
+          "type": "boolean",
+          "default": true,
+          "description": "Open a file in the editor when clicking it in the tree."
+        }
+      }
     }
   }
 }
